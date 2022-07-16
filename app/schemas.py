@@ -1,3 +1,4 @@
+from hashlib import blake2b
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -9,6 +10,18 @@ class WalletCreate(WalletBase):
     class Config:
         orm_mode = True
 
+class DepositAddressCreate(BaseModel):
+    api_key: str
+    user_id: int
+    account_index: int
+    num_of_addresses: int
+    blockchain: str
+
+class DepositAddress(BaseModel):
+    address: str
+    blockchain: str
+    user_id: int
+    account_index: int
 class ItemBase(BaseModel):
     title: str
     description: Union[str, None] = None
