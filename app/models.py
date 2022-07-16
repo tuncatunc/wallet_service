@@ -1,8 +1,14 @@
 from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from ..database import Base
+from .database import Base
 
+class Wallet(Base):
+    __tablename__ = "wallets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    api_key = Column(String, unique=True, index=True)
+    wallet_mnemonic = Column(String)
 
 class User(Base):
     __tablename__ = "users"

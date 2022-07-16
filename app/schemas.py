@@ -2,6 +2,12 @@ from typing import List, Union
 
 from pydantic import BaseModel
 
+class WalletBase(BaseModel):
+    api_key: str
+
+class WalletCreate(WalletBase):
+    class Config:
+        orm_mode = True
 
 class ItemBase(BaseModel):
     title: str
