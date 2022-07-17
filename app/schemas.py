@@ -1,4 +1,6 @@
+from enum import Enum
 from hashlib import blake2b
+from optparse import Option
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -13,12 +15,18 @@ class WalletCreate(WalletBase):
         orm_mode = True
 
 
+class BlockchainEnum(str, Enum):
+    ethereum = "eth"
+    solana = "sol"
+
+
 class DepositAddressCreate(BaseModel):
     api_key: str
     user_id: int
     account_index: int
     num_of_addresses: int
-    blockchain: str
+    # ethereum or solana
+    blockchain: BlockchainEnum
 
 
 class DepositAddress(BaseModel):
@@ -27,7 +35,14 @@ class DepositAddress(BaseModel):
     user_id: int
     account_index: int
 
+class TransactionHash(BaseModel):
+    hash: str
 
+class WithdrawEthereum(BaseModel):
+    api_key: str
+    user_id: int
+    to_address: str
+    amount: str
 class ItemBase(BaseModel):
     title: str
     description: Union[str, None] = None

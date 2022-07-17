@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app import crud
 # from sqlalchemy.sql.functions import func
-from .schemas import WalletCreate, DepositAddress, DepositAddressCreate
+from .schemas import TransactionHash, WalletCreate, DepositAddress, DepositAddressCreate, WithdrawEthereum
 from .database import get_db
 
 walletRouter = APIRouter(
@@ -39,7 +39,14 @@ def get_deposit_address(req: DepositAddressCreate, db: Session = Depends(get_db)
         user_id=req.user_id,
         account_index=req.account_index)
 
-@walletRouter.get("/", response_model=List[WalletCreate])
-def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    wallets = crud.get_wallets(db, skip=skip, limit=limit)
-    return wallets
+# Transfer etherum to another address
+@walletRouter.post("/transfer", response_model=TransactionHash)
+def transfer_etherum(req: WithdrawEthereum, db: Session = Depends(get_db)):
+    tx_hash = crud.withdraw_ethereum(
+        db, 
+        req.api_key,
+        req.user_id,
+        req.to_address,
+        req.amount)
+    
+    return TransactionHash(hash=tx_hash)

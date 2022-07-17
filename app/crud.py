@@ -54,6 +54,14 @@ def get_deposit_address(
 def get_wallets(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Wallet).offset(skip).limit(limit).all()
 
+
+def withdraw_ethereum(
+        db: Session,
+        api_key: str,
+        user_id: int,
+        to_address: str,
+        amount: int):
+    pass
 # def get_user(db: Session, user_id: int):
 #     return db.query(models.User).filter(models.User.id == user_id).first()
 
