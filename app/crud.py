@@ -12,12 +12,12 @@ from . import models
 from . import schemas
 
 
-def create_wallet(db: Session, wallet: schemas.WalletCreate):
+def create_wallet(db: Session):
     hd_wallet_fact = HdWalletBipFactory(HdWalletBip44Coins.ETHEREUM)
     hd_wallet = hd_wallet_fact.CreateRandom(
         "Ethereum Wallet", HdWalletBipWordsNum.WORDS_NUM_24)
 
-    wallet_mnemonic = hd_wallet.ToDict().get('m_wallet_data').get('mnemonic')
+    wallet_mnemonic = hd_wallet.GetData(HdWalletBipDataTypes.MNEMONIC)
     api_key = secrets.token_urlsafe(32)
     db_wallet = models.Wallet(api_key=api_key, wallet_mnemonic=wallet_mnemonic)
 
@@ -48,7 +48,7 @@ def get_deposit_address(
                        addr_num=num_of_addresses, addr_off=0)
     # address = hd_wallet.GetKey(HdWalletBipDataTypes.ADDRESS)
 
-    return hd_wallet.m_wallet_data["address"].m_addr[0].m_key_data['address']
+    return hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()["address_0"]["address"]
 
 
 def get_wallets(db: Session, skip: int = 0, limit: int = 100):

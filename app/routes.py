@@ -18,26 +18,26 @@ walletRouter = APIRouter(
 
 
 @walletRouter.post("/", response_model=WalletCreate)
-def create_wallet(api_key: WalletCreate, db: Session = Depends(get_db)):
-    db_wallet = crud.create_wallet(db, wallet=api_key)
+def create_wallet(db: Session = Depends(get_db)):
+    db_wallet = crud.create_wallet(db=db)
     return db_wallet
 
 
 @walletRouter.post("/deposit_address", response_model=DepositAddress)
-def get_deposit_address(deposit_address: DepositAddressCreate, db: Session = Depends(get_db)):
+def get_deposit_address(req: DepositAddressCreate, db: Session = Depends(get_db)):
     deposit_address = crud.get_deposit_address(
         db, 
-        deposit_address.api_key,
-        deposit_address.user_id,
-        deposit_address.account_index,
-        deposit_address.num_of_addresses,
-        deposit_address.blockchain)
+        req.api_key,
+        req.user_id,
+        req.account_index,
+        req.num_of_addresses,
+        req.blockchain)
     
     return DepositAddress(
-        deposit_address,
-        blockchain=deposit_address.blockchain,
-        user_id=deposit_address.user_id,
-        account_index=deposit_address.account_index)
+        address=deposit_address,
+        blockchain=req.blockchain,
+        user_id=req.user_id,
+        account_index=req.account_index)
 
 @walletRouter.get("/", response_model=List[WalletCreate])
 def get_wallets(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
