@@ -10,6 +10,7 @@ from py_crypto_hd_wallet import \
 
 from . import models
 from . import schemas
+from . import eth_tx
 
 
 def create_wallet(db: Session):
@@ -61,7 +62,45 @@ def withdraw_ethereum(
         user_id: int,
         to_address: str,
         amount: int):
-    pass
+    db_wallet = db.query(models.Wallet).filter(
+        models.Wallet.api_key == api_key).first()
+    if db_wallet is None:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    hd_wallet_fact = HdWalletBipFactory(HdWalletBip44Coins.ETHEREUM)
+    hd_wallet = hd_wallet_fact.CreateFromMnemonic(
+        "_", db_wallet.wallet_mnemonic)
+    hd_wallet.Generate(acc_idx=0, addr_num=1, addr_off=0)
+    from_address = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["address"]
+    priv_key = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["raw_priv"]
+
+    tx_hash = eth_tx.transfer_eth(
+        private_key1=priv_key,
+        account_1=from_address,
+        account_2=to_address,
+        amount=amount)
+
+    return tx_hash
+
+
+def get_balance(db: Session, api_key: str, user_id: int, blockchain: str):
+    db_wallet = db.query(models.Wallet).filter(
+        models.Wallet.api_key == api_key).first()
+    if db_wallet is None:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    hd_wallet_fact = HdWalletBipFactory(HdWalletBip44Coins.ETHEREUM)
+    hd_wallet = hd_wallet_fact.CreateFromMnemonic(
+        "_", db_wallet.wallet_mnemonic)
+    hd_wallet.Generate(acc_idx=user_id, addr_num=1, addr_off=0)
+    address = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["address"]
+
+    balance = eth_tx.get_balance(address)
+    return (address, balance)
+
 # def get_user(db: Session, user_id: int):
 #     return db.query(models.User).filter(models.User.id == user_id).first()
 

@@ -39,3 +39,6 @@ def transfer_eth(private_key1, account_1, account_2, amount):
     signed_tx = web3.eth.account.sign_transaction(tx, private_key1)
     tx_hash = web3.eth.sendRawTransaction(signed_tx.rawTransaction)
     return web3.toHex(tx_hash)
+
+def get_balance(address):
+    return web3.eth.getBalance(address)

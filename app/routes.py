@@ -6,7 +6,7 @@ from sqlalchemy import func
 
 from app import crud
 # from sqlalchemy.sql.functions import func
-from .schemas import TransactionHash, WalletCreate, DepositAddress, DepositAddressCreate, WithdrawEthereum
+from .schemas import TransactionHash, WalletCreate, DepositAddress, DepositAddressCreate, WithdrawEthereum, WalletBalance, WalletBalanceReq
 from .database import get_db
 
 walletRouter = APIRouter(
@@ -26,13 +26,13 @@ def create_wallet(db: Session = Depends(get_db)):
 @walletRouter.post("/deposit_address", response_model=DepositAddress)
 def get_deposit_address(req: DepositAddressCreate, db: Session = Depends(get_db)):
     deposit_address = crud.get_deposit_address(
-        db, 
+        db,
         req.api_key,
         req.user_id,
         req.account_index,
         req.num_of_addresses,
         req.blockchain)
-    
+
     return DepositAddress(
         address=deposit_address,
         blockchain=req.blockchain,
@@ -40,13 +40,30 @@ def get_deposit_address(req: DepositAddressCreate, db: Session = Depends(get_db)
         account_index=req.account_index)
 
 # Transfer etherum to another address
-@walletRouter.post("/transfer", response_model=TransactionHash)
+
+
+@walletRouter.post("/withdraw_eth", response_model=TransactionHash)
 def transfer_etherum(req: WithdrawEthereum, db: Session = Depends(get_db)):
     tx_hash = crud.withdraw_ethereum(
-        db, 
+        db,
         req.api_key,
         req.user_id,
         req.to_address,
         req.amount)
-    
+
     return TransactionHash(hash=tx_hash)
+
+
+@walletRouter.post("/balance", response_model=WalletBalance)
+def get_balance(req: WalletBalanceReq, db: Session = Depends(get_db)):
+    (address, balance) = crud.get_balance(
+        db,
+        req.api_key,
+        req.user_id,
+        req.blockchain)
+
+    return WalletBalance(
+        blockchain=req.blockchain,
+        balance=balance,
+        address=address,
+        user_id=req.user_id)

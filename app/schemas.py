@@ -1,6 +1,4 @@
 from enum import Enum
-from hashlib import blake2b
-from optparse import Option
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -8,6 +6,19 @@ from pydantic import BaseModel
 
 class WalletBase(BaseModel):
     api_key: str
+
+
+class WalletBalance(BaseModel):
+    blockchain: str
+    balance: int
+    address: str
+    user_id: int
+
+
+class WalletBalanceReq(BaseModel):
+    api_key: str
+    user_id: int
+    blockchain: str
 
 
 class WalletCreate(WalletBase):
@@ -35,14 +46,18 @@ class DepositAddress(BaseModel):
     user_id: int
     account_index: int
 
+
 class TransactionHash(BaseModel):
     hash: str
+
 
 class WithdrawEthereum(BaseModel):
     api_key: str
     user_id: int
     to_address: str
     amount: str
+
+
 class ItemBase(BaseModel):
     title: str
     description: Union[str, None] = None
