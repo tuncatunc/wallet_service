@@ -76,11 +76,40 @@ def withdraw_ethereum(
     priv_key = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
         "address_0"]["raw_priv"]
 
-    try:        
+    try:
         tx_hash = eth_tx.transfer_eth(
             private_key1=priv_key,
             account_1=from_address,
             account_2=to_address,
+            amount=amount)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return tx_hash
+
+
+def transfer_eth_to_user(db: Session, api_key: str, user_1_id: int, user_2_id: int, amount: float):
+    db_wallet = db.query(models.Wallet).filter(
+        models.Wallet.api_key == api_key).first()
+    if db_wallet is None:
+        raise HTTPException(status_code=404, detail="Wallet not found")
+
+    hd_wallet_fact = HdWalletBipFactory(HdWalletBip44Coins.ETHEREUM)
+    hd_wallet = hd_wallet_fact.CreateFromMnemonic(
+        "_", db_wallet.wallet_mnemonic)
+    hd_wallet.Generate(acc_idx=user_1_id, addr_num=1, addr_off=0)
+    address_1 = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["address"]
+    hd_wallet.Generate(acc_idx=user_2_id, addr_num=1, addr_off=0)
+    address_2 = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["address"]
+    priv_key_1 = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
+        "address_0"]["raw_priv"]
+
+    try:
+        tx_hash = eth_tx.transfer_eth(
+            private_key1=priv_key_1,
+            account_1=address_1,
+            account_2=address_2,
             amount=amount)
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

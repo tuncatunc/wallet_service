@@ -1,4 +1,5 @@
 from enum import Enum
+from signal import strsignal
 from typing import List, Union
 
 from pydantic import BaseModel
@@ -56,6 +57,13 @@ class WithdrawEthereum(BaseModel):
     user_id: int
     to_address: str
     amount: str
+
+
+class TransferEthToUser(BaseModel):
+    api_key: str
+    user_1_id: int
+    user_2_id: int
+    amount: float
 
 
 class ItemBase(BaseModel):
