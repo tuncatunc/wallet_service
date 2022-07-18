@@ -76,12 +76,14 @@ def withdraw_ethereum(
     priv_key = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
         "address_0"]["raw_priv"]
 
-    tx_hash = eth_tx.transfer_eth(
-        private_key1=priv_key,
-        account_1=from_address,
-        account_2=to_address,
-        amount=amount)
-
+    try:        
+        tx_hash = eth_tx.transfer_eth(
+            private_key1=priv_key,
+            account_1=from_address,
+            account_2=to_address,
+            amount=amount)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
     return tx_hash
 
 
