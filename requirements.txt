@@ -3,3 +3,4 @@ uvicorn
 pydantic
 web3
 py_crypto_hd_wallet
+sqlalchemy
