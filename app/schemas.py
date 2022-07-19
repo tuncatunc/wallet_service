@@ -35,8 +35,6 @@ class BlockchainEnum(str, Enum):
 class DepositAddressCreate(BaseModel):
     api_key: str
     user_id: int
-    account_index: int
-    num_of_addresses: int
     # ethereum or solana
     blockchain: BlockchainEnum
 
@@ -45,7 +43,6 @@ class DepositAddress(BaseModel):
     address: str
     blockchain: str
     user_id: int
-    account_index: int
 
 
 class TransactionHash(BaseModel):

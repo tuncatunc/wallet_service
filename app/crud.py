@@ -32,8 +32,6 @@ def get_deposit_address(
         db: Session,
         api_key: str,
         user_id: int,
-        user_account_index: int,
-        num_of_addresses=1,
         blockchain: str = "ETH"):
     db_wallet = db.query(models.Wallet).filter(
         models.Wallet.api_key == api_key).first()
@@ -45,8 +43,7 @@ def get_deposit_address(
         wallet_name="wallet_name",
         mnemonic=db_wallet.wallet_mnemonic)
 
-    hd_wallet.Generate(acc_idx=user_account_index,
-                       addr_num=num_of_addresses, addr_off=0)
+    hd_wallet.Generate(acc_idx=user_id, addr_num=1, addr_off=0)
     # address = hd_wallet.GetKey(HdWalletBipDataTypes.ADDRESS)
 
     return hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()["address_0"]["address"]
@@ -70,7 +67,7 @@ def withdraw_ethereum(
     hd_wallet_fact = HdWalletBipFactory(HdWalletBip44Coins.ETHEREUM)
     hd_wallet = hd_wallet_fact.CreateFromMnemonic(
         "_", db_wallet.wallet_mnemonic)
-    hd_wallet.Generate(acc_idx=0, addr_num=1, addr_off=0)
+    hd_wallet.Generate(acc_idx=user_id, addr_num=1, addr_off=0)
     from_address = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[
         "address_0"]["address"]
     priv_key = hd_wallet.GetData(HdWalletBipDataTypes.ADDRESS).ToDict()[

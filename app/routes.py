@@ -29,15 +29,12 @@ def get_deposit_address(req: DepositAddressCreate, db: Session = Depends(get_db)
         db,
         req.api_key,
         req.user_id,
-        req.account_index,
-        req.num_of_addresses,
         req.blockchain)
 
     return DepositAddress(
         address=deposit_address,
         blockchain=req.blockchain,
-        user_id=req.user_id,
-        account_index=req.account_index)
+        user_id=req.user_id)
 
 # Transfer etherum to another address
 
